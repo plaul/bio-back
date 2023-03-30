@@ -91,6 +91,7 @@ public class SecurityConfig {
             .requestMatchers("/api/cookie/**").permitAll()
 
             //Allow anonymous access to this endpoint
+            .requestMatchers(HttpMethod.GET, "/index.html").permitAll()
             .requestMatchers(HttpMethod.GET,"/api/movieshow/{date}").permitAll()
             .requestMatchers(HttpMethod.GET,"/api/movie").permitAll()
             .requestMatchers(HttpMethod.GET,"/api/movie/{id}").permitAll()
