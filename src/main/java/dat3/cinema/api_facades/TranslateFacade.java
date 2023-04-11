@@ -16,6 +16,7 @@ public class TranslateFacade {
 
   static final String URI = "https://api.openai.com/v1/completions";
 
+  public static final String NOT_TRANSLATED = "NOT TRANSLATED";
 
   @Value("${OPENAI_KEY}")
   private String OPENAPI_KEY;
@@ -38,15 +39,22 @@ public class TranslateFacade {
     requestBody.put("presence_penalty", 0.0);
 
     HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-    ResponseEntity<String> response = restTemplate.exchange("https://api.openai.com/v1/completions", HttpMethod.POST, entity, String.class);
+    try {
+      ResponseEntity<String> response = restTemplate.exchange("https://api.openai.com/v1/completions", HttpMethod.POST, entity, String.class);
+      String responseBody = response.getBody();
+      System.out.println(responseBody);
 
-    String responseBody = response.getBody();
-    System.out.println(responseBody);
+      ObjectMapper om = new ObjectMapper();
+      TranslateDTO root = om.readValue(responseBody, TranslateDTO.class);
+      String result =  root.choices.get(0).text;
+      return result.replaceAll("^[\r\n]+", ""); // remove leading newlines
 
-    ObjectMapper om = new ObjectMapper();
-    TranslateDTO root = om.readValue(responseBody, TranslateDTO.class);
-    String result =  root.choices.get(0).text;
-    return result.replaceAll("^[\r\n]+", ""); // remove leading newlines
+    } catch (Exception e){
+      System.out.println(e.getMessage());
+      return NOT_TRANSLATED;
+    }
+
+
   }
 
   public static void main(String[] args) throws JsonProcessingException {

@@ -87,11 +87,14 @@ public class MovieService {
 
     try {
       movie = movieRepository.save(movie);
-      return movie;
     } catch (DataIntegrityViolationException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getRootCause().getMessage());
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not add movie");
     }
+    if(movie.getPlotDK().equals(TranslateFacade.NOT_TRANSLATED)){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plot could not be translated, but movie was added to the database with this text for plotDK: "+TranslateFacade.NOT_TRANSLATED);
+    }
+    return movie;
   }
 }
